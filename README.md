@@ -4,29 +4,24 @@
 
 For UNC Comp 524
 
-This repository contains the Parser library excised from the SML-NJ compiler. We
-kept the Basics library as a reference, as well, though it is not actually used.
+This repository contains supporting libraries and style-checks for SML programs
+for UNC Comp 524.
 
-Load the Parser library with
+This repository also contains the Parser and Basics libraries excised from the
+SML-NJ compiler. We kept them as a reference, though it neither is directly
+actually used. Instead, we load `$smlnj/compiler/current.cm`, which should work
+on all platforms with an SML-NJ system.
 
-```bash
-sml Parse/parser.cm
-```
-
-An example of parsing a file follows:
+An example of parsing a file follows (`sml style-utils/sources.cm`):
 
 ```sml
 (* make an AST *)
-val filepath = "...";
-val source_stream = TextIO.openIn filepath;
-val device = PrettyPrint.defaultDevice;
-val source = Source.newSource (filepath, sourceStream, false, device);
-val ast = SmlFile.parse source;
+val parsed = FileParser.parse "...";
+#ast parsed;
 
 (* pretty print it *)
-val pp_stream = PrettyPrint.openStream device;
 val depth = ...; (* 1, 2, …, 999, … *)
-PPAst.ppDec (SOME source) pp_stream (ast, depth);
+FileParser.pp depth parsed;
 ```
 
 Creating style-checks for UNC Comp 524 is work-in-progress.
