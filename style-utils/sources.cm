@@ -5,4 +5,7 @@ is
 
   $/basis.cm
   $smlnj/compiler/current.cm
+  $smlnj/viscomp/basics.cm
   $smlnj/viscomp/parser.cm
+  $smlnj/viscomp/elabdata.cm
+  $smlnj/viscomp/elaborate.cm
