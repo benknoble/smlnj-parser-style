@@ -2,12 +2,14 @@ Library
 
   structure FileParser
   structure Elaborator
+  structure AstUtil
   structure Grader
 
 is
 
   file-parser.sml
   elaborator.sml
+  ast-util.sml
   grader.sml
 
   $/basis.cm
