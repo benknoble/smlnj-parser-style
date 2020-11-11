@@ -1,7 +1,14 @@
-Group
+Library
+
+  structure FileParser
+  structure Elaborator
+  structure Grader
+
 is
 
   file-parser.sml
+  elaborator.sml
+  grader.sml
 
   $/basis.cm
   $smlnj/compiler/current.cm
@@ -9,3 +16,5 @@ is
   $smlnj/viscomp/parser.cm
   $smlnj/viscomp/elabdata.cm
   $smlnj/viscomp/elaborate.cm
+
+  $smlnj/cm.cm
