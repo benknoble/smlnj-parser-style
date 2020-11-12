@@ -1,6 +1,7 @@
 structure Grader: sig
   val print_bound_names: FileParser.parseResult -> unit
   val exp_contains: FileParser.parseResult -> Symbol.symbol -> string -> bool
+  val anywhere_contains: FileParser.parseResult -> string -> bool
 end = struct
   fun println s = print (s ^ "\n")
 
