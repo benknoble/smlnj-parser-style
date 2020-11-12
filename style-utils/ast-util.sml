@@ -3,6 +3,7 @@ structure AstUtil: sig
   val pp_to_string: int -> int -> Ast.dec -> string
   val strip_marks: Ast.dec -> Ast.dec
   structure SymbolMap: ORD_MAP where type Key.ord_key = Symbol.symbol
+  val symbol_table: Ast.dec -> Ast.exp list SymbolMap.map
 end = struct
   open Ast
 
@@ -14,10 +15,6 @@ end = struct
   fun pp_to_string width depth ast =
     PrettyPrint.pp_to_string width (PPAst.ppDec NONE) (ast, depth)
 
-  structure SymbolMap = RedBlackMapFn(struct
-    type ord_key = Symbol.symbol
-    fun compare (s1, s2) = String.compare (Symbol.name s1, Symbol.name s2)
-  end)
 
   fun strip_marks dec =
     case dec
@@ -262,5 +259,56 @@ end = struct
        | RecordTy sts => RecordTy (map (fn (s, t) => (s, strip_marks_ty t)) sts)
        | TupleTy ts => TupleTy (map strip_marks_ty ts)
        | MarkTy (t', _) => strip_marks_ty t'
+
+  structure SymbolMap = RedBlackMapFn(struct
+    type ord_key = Symbol.symbol
+    fun compare (s1, s2) = String.compare (Symbol.name s1, Symbol.name s2)
+  end)
+  structure SM = SymbolMap
+
+  fun symbol_table dec =
+    let
+      val no_marks = strip_marks dec
+      val ins = SM.insertWith (op @)
+      val path_to_sym = Symbol.varSymbol o SymPath.toString o SymPath.SPATH
+      fun symbol_table' dec map =
+        case dec
+          of ValDec (vbs, tyvs) =>
+               foldl (fn (v, m) => symbol_table_vb v m) map vbs
+           | ValrecDec (rvbs, tyvs) =>
+               foldl (fn (v, m) => symbol_table_rvb v m) map rvbs
+           | FunDec (fbs, tyvs) =>
+               foldl (fn (f, m) => symbol_table_fb f m) map fbs
+           | LocalDec (_, dec') => symbol_table' dec' map
+           | SeqDec decs => foldl (fn (d, m) => symbol_table' d m) map decs
+           | _ => map
+      and symbol_table_vb (Vb {pat, exp, ...}) m = symbol_table_pat pat exp m
+      and symbol_table_pat p e m =
+        case p
+          of VarPat path => ins (m, path_to_sym path, [e])
+           | RecordPat {def, ...} =>
+               foldl (fn (s, m) => ins (m, s, [e])) m (map #1 def)
+          | ListPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
+          | TuplePat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
+          | FlatAppPat pis =>
+               foldl (fn (p, m) => symbol_table_pat p e m) m (map #item pis)
+          | AppPat {argument, ...} => symbol_table_pat argument e m
+          | ConstraintPat {pattern, ...} => symbol_table_pat pattern e m
+          | LayeredPat {varPat, expPat} =>
+              symbol_table_pat varPat e (symbol_table_pat expPat e m)
+          | VectorPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
+          | OrPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
+           | _ => m
+      and symbol_table_rvb (Rvb {var, exp, ...}) m = ins (m, var, [exp])
+      and symbol_table_fb (Fb (clauses, _)) m =
+        let
+          val exps = map (fn (Clause {exp, ...}) => exp) clauses
+          val Clause {pats={item=VarPat [name], ...}::_, ...} = hd clauses
+        in
+          ins (m, name, exps)
+        end
+    in
+      symbol_table' no_marks SM.empty
+    end
 
 end
