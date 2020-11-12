@@ -14,6 +14,7 @@ is
 
   $/basis.cm
   $/smlnj-lib.cm
+  $/regexp-lib.cm
 
   $smlnj/compiler/current.cm
   $smlnj/viscomp/basics.cm
