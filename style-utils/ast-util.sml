@@ -1,6 +1,7 @@
 structure AstUtil: sig
   val pp: int -> Ast.dec -> unit
   val pp_to_string: int -> int -> Ast.dec -> string
+  val pp_e_to_string: int -> int -> Ast.exp -> string
   val strip_marks: Ast.dec -> Ast.dec
   structure SymbolMap: ORD_MAP where type Key.ord_key = Symbol.symbol
   val symbol_table: Ast.dec -> Ast.exp list SymbolMap.map
@@ -15,6 +16,8 @@ end = struct
   fun pp_to_string width depth ast =
     PrettyPrint.pp_to_string width (PPAst.ppDec NONE) (ast, depth)
 
+  fun pp_e_to_string width depth ast =
+    PrettyPrint.pp_to_string width (PPAst.ppExp NONE) (ast, depth)
 
   fun strip_marks dec =
     case dec
