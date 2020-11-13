@@ -2,6 +2,7 @@ structure GraderUtils: sig
   val print_bound_names: FileParser.parseResult -> unit
   val exp_contains: Symbol.symbol -> string -> FileParser.parseResult -> bool
   val anywhere_contains: string -> FileParser.parseResult -> bool
+  val fun_contains: string -> FileParser.parseResult -> bool
 
   val alts: string list -> string
   type 'a check = (FileParser.parseResult -> 'a) * string
@@ -33,7 +34,7 @@ end = struct
 
   fun exp_contains sym str (pr: FileParser.parseResult) =
     let
-      val sym_table = AstUtil.symbol_table (#ast pr)
+      val (sym_table, _) = AstUtil.symbol_table (#ast pr)
       val exps = AstUtil.SymbolMap.find (sym_table, sym)
       val expss = Option.map (List.map (AstUtil.pp_e_to_string 80 99)) exps
     in
@@ -42,13 +43,21 @@ end = struct
 
   fun anywhere_contains str (pr: FileParser.parseResult) =
     let
-      val sym_table = AstUtil.symbol_table (#ast pr)
+      val (sym_table, _) = AstUtil.symbol_table (#ast pr)
       val exps = List.concat (AstUtil.SymbolMap.listItems sym_table)
       val expss = List.map (AstUtil.pp_e_to_string 80 99) exps
     in
       contains expss str
     end
 
+  fun fun_contains str (pr: FileParser.parseResult) =
+    let
+      val (_, fun_table) = AstUtil.symbol_table (#ast pr)
+      val exps = List.concat (AstUtil.SymbolMap.listItems fun_table)
+      val expss = List.map (AstUtil.pp_e_to_string 80 99) exps
+    in
+      contains expss str
+    end
 
   val alts = String.concatWith "|"
 

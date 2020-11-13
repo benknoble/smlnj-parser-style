@@ -4,7 +4,7 @@ structure AstUtil: sig
   val pp_e_to_string: int -> int -> Ast.exp -> string
   val strip_marks: Ast.dec -> Ast.dec
   structure SymbolMap: ORD_MAP where type Key.ord_key = Symbol.symbol
-  val symbol_table: Ast.dec -> Ast.exp list SymbolMap.map
+  val symbol_table: Ast.dec -> Ast.exp list SymbolMap.map * Ast.exp list SymbolMap.map
 end = struct
   open Ast
 
@@ -285,7 +285,7 @@ end = struct
            | LocalDec (_, dec') => symbol_table' dec' map
            | SeqDec decs => foldl (fn (d, m) => symbol_table' d m) map decs
            | _ => map
-      and symbol_table_vb (Vb {pat, exp, ...}) m = symbol_table_pat pat exp m
+      and symbol_table_vb (Vb {pat, exp, ...}) (m, fm) = (symbol_table_pat pat exp m, fm)
       and symbol_table_pat p e m =
         case p
           of VarPat path => ins (m, path_to_sym path, [e])
@@ -302,16 +302,16 @@ end = struct
           | VectorPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
           | OrPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
            | _ => m
-      and symbol_table_rvb (Rvb {var, exp, ...}) m = ins (m, var, [exp])
-      and symbol_table_fb (Fb (clauses, _)) m =
+      and symbol_table_rvb (Rvb {var, exp, ...}) (m, fm) = (ins (m, var, [exp]), fm)
+      and symbol_table_fb (Fb (clauses, _)) (m, fm) =
         let
           val exps = map (fn (Clause {exp, ...}) => exp) clauses
           val Clause {pats={item=VarPat [name], ...}::_, ...} = hd clauses
         in
-          ins (m, name, exps)
+          (ins (m, name, exps), ins (fm, name, exps))
         end
     in
-      symbol_table' no_marks SM.empty
+      symbol_table' no_marks (SM.empty, SM.empty)
     end
 
 end
