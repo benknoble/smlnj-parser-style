@@ -1,7 +1,7 @@
 structure Grader: sig
   val print_bound_names: FileParser.parseResult -> unit
-  val exp_contains: FileParser.parseResult -> Symbol.symbol -> string -> bool
-  val anywhere_contains: FileParser.parseResult -> string -> bool
+  val exp_contains: Symbol.symbol -> string -> FileParser.parseResult -> bool
+  val anywhere_contains: string -> FileParser.parseResult -> bool
 end = struct
   fun println s = print (s ^ "\n")
 
@@ -20,7 +20,7 @@ end = struct
       List.exists matches exps
     end
 
-  fun exp_contains (pr: FileParser.parseResult) sym str =
+  fun exp_contains sym str (pr: FileParser.parseResult) =
     let
       val sym_table = AstUtil.symbol_table (#ast pr)
       val exps = AstUtil.SymbolMap.find (sym_table, sym)
@@ -29,7 +29,7 @@ end = struct
       Option.isSome exps andalso contains (Option.valOf expss) str
     end
 
-  fun anywhere_contains (pr: FileParser.parseResult) str =
+  fun anywhere_contains str (pr: FileParser.parseResult) =
     let
       val sym_table = AstUtil.symbol_table (#ast pr)
       val exps = List.concat (AstUtil.SymbolMap.listItems sym_table)
