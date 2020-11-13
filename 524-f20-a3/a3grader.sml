@@ -31,6 +31,9 @@ structure A3Grader: GRADER = GraderFn(
     val curriedMatchingDerivedSafe_calls_curryableMatchingSafe_with_derivedSafeMatcher =
       pass o (calls_with_arg "curriedMatchingDerivedSafe" "curryableMatchingSafe" "derivedSafeMatcher")
 
+    val no_magic_numbers_in_functions =
+      pass o (fun_contains "[2-9]")
+
     val checks: result check list = [
       (no_disallowed_functions, "no disallowed functions")
     , (matchingDerivedSafe_calls_matchingSafe_with_matcher, "matching derived safe calls matching safe with matcher")
@@ -40,6 +43,7 @@ structure A3Grader: GRADER = GraderFn(
     , (curriedTwiceInterpolatedSafe_calls_curriedOnceInterpolatedSafe, "curried twice interpolated safe calls curried once interpolated safe")
     , (curriedMatchingGivenSafe_calls_curryableMatchingSafe_with_givenSafeMatcher, "curried matching given safe calls curryable matching safe with given safe matcher")
     , (curriedMatchingDerivedSafe_calls_curryableMatchingSafe_with_derivedSafeMatcher, "curried matching derived safe calls curryable matching safe with derived safe matcher")
+    , (no_magic_numbers_in_functions, "no magic numbers in functions")
     ]
   end
 )
