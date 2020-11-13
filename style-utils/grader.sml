@@ -2,6 +2,7 @@ structure Grader: sig
   val print_bound_names: FileParser.parseResult -> unit
   val exp_contains: Symbol.symbol -> string -> FileParser.parseResult -> bool
   val anywhere_contains: string -> FileParser.parseResult -> bool
+  val varSymbol: string -> Symbol.symbol
 end = struct
   fun println s = print (s ^ "\n")
 
@@ -37,5 +38,7 @@ end = struct
     in
       contains expss str
     end
+
+  open Symbol
 
 end
