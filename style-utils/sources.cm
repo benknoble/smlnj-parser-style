@@ -3,7 +3,9 @@ Library
   structure FileParser
   structure Elaborator
   structure AstUtil
-  structure Grader
+  structure GraderUtils
+  signature GRADER
+  functor GraderFn
 
 is
 
