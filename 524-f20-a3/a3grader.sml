@@ -32,7 +32,7 @@ structure A3Grader: GRADER = GraderFn(
       pass o (calls_with_arg "curriedMatchingDerivedSafe" "curryableMatchingSafe" "derivedSafeMatcher")
 
     val no_magic_numbers_in_functions =
-      pass o (fun_contains "[2-9]")
+      fail o (fun_contains "[ \\f\\n\\r\\t][2-9]+[ \\f\\n\\r\\t]")
 
     val checks: result check list = [
       (no_disallowed_functions, "no disallowed functions")
