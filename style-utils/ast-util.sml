@@ -319,11 +319,12 @@ end = struct
               symbol_table_pat varPat e (symbol_table_pat expPat e m)
           | VectorPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
           | OrPat ps => foldl (fn (p, m) => symbol_table_pat p e m) m ps
-           | _ => m
+          | _ => m
       and symbol_table_rvb (Rvb {var, exp, ...}) (m, fm) = (ins (m, var, [exp]), fm)
       and symbol_table_fb (Fb (clauses, _)) (m, fm) =
         let
           val exps = map (fn (Clause {exp, ...}) => exp) clauses
+          (* binds name -----------------vvvv *)
           val Clause {pats={item=VarPat [name], ...}::_, ...} = hd clauses
         in
           (ins (m, name, exps), ins (fm, name, exps))
