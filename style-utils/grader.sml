@@ -1,18 +1,48 @@
+(* utilities for grading SML source statically *)
 structure GraderUtils: sig
+  (* prints the top-level names bound by the source *)
   val print_bound_names: FileParser.parseResult -> unit
+
+  (* true iff the expressions corresponding to the binding of the symbol match
+   * the regular expression denoted by the string *)
   val exp_contains: Symbol.symbol -> string -> FileParser.parseResult -> bool
+  (* true iff any of the ast expressions match the regular expression *)
   val anywhere_contains: string -> FileParser.parseResult -> bool
+  (* true iff any of the expressions corresponding to a function-declaration
+   * match the regular expression *)
   val fun_contains: string -> FileParser.parseResult -> bool
 
+  (* concatenates a list of regular-expressions into a single regular-expression
+   * matching any of them ("alternates") *)
   val alts: string list -> string
+  (* type of named checks returning some value of type 'a *)
   type 'a check = (FileParser.parseResult -> 'a) * string
+  (* type of reportable checks *)
   type reportable
+  (* turns a check into a reportable; needs to know how to display results *)
   val mk_reportable: ('a -> string) -> 'a check -> reportable
+  (* a result that makes a good fit for the 'a in 'a check *)
   datatype result = Pass | Fail
+  (* conversion functions from bool -> result
+   *
+   * it is thus easy to create result checks by composing pass or fail with the
+   * #1 of a bool check *)
   val pass: bool -> result
   val fail: bool -> result
+  (* conversion from result -> string; a good fit for the argument to
+   * mk_reportable *)
   val result_to_string: result -> string
+
+  (* true iff the expression bound to the first param calls the second
+   *
+   * e.g., if we have fun foo x = bar x, then
+   * calls "foo" "bar" … should be true *)
   val calls: string -> string -> FileParser.parseResult -> bool
+  (* same as calls, but the third param represents an arg to the function being
+   * called
+   *
+   * in the earlier example, we should have that
+   * calls "foo" "bar" "x" … be true *)
   val calls_with_arg: string -> string -> string -> FileParser.parseResult -> bool
 end = struct
   fun println s = print (s ^ "\n")
