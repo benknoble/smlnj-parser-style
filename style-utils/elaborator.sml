@@ -1,5 +1,17 @@
+(* structure wrapping up the visible compiler's elaborator in a hopefully useful
+ * way *)
 structure Elaborator: sig
+  (* uses the visible compiler's elaborator to elaborate the ast
+   *
+   * this includes things like type-checking, fixity-parsing, etc. (I think)
+   *
+   * currently gives some spurious warnings about structures not being found
+   * from the basis, even though we forcibly load it *)
   val elaborate: FileParser.parseResult -> Absyn.dec * StaticEnv.staticEnv
+
+  (* given the ast result, returns a list of names bound at the top-level
+   *
+   * useful for checking identifiers against style rules *)
   val bound_names: FileParser.parseResult -> string list
 end = struct
   fun elaborate ({ast, source, ...}: FileParser.parseResult) =
