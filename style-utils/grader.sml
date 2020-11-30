@@ -112,13 +112,21 @@ end = struct
 
 end
 
+(* A grader program *)
 signature GRADER = sig
+  (* runs all the checks, producing some consumable output *)
   val runall: string -> unit
 end
 
+(* creates a GRADER that prints out output like
+ *
+ * test name: result *)
 functor GraderFn(
+  (* the result type of the checks in checks *)
   type result
+  (* a list of checks to run *)
   val checks: result GraderUtils.check list
+  (* a conversion from result -> string for mk_reportable *)
   val result_to_string: result -> string
 ): GRADER = struct
   val reports: GraderUtils.reportable list = map (GraderUtils.mk_reportable result_to_string) checks
