@@ -1,10 +1,19 @@
+(* structure with parsing utilities from the visible compiler *)
 structure FileParser: sig
+  (* wraps up everything you might need from parsing *)
   type parseResult = { ast: Ast.dec
                      , device: PrettyPrint.device
                      , source: Source.inputSource
                      }
+
+  (* parses a file (name given by the first param) into an ast *)
   val parse: string -> parseResult
+
+  (* pretty-prints the ast using the attached device. first param is depth *)
   val pp: int -> parseResult -> unit
+
+  (* similar to pp, but first params are width & depth. instead of printing,
+   * returns the string *)
   val pp_to_string: int -> int -> parseResult -> string
 end = struct
   type parseResult = { ast: Ast.dec
