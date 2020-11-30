@@ -1,9 +1,27 @@
+(* utilities for manipulating ast's *)
 structure AstUtil: sig
+  (* practically equivalent to FileParser.pp *)
   val pp: int -> Ast.dec -> unit
+
+  (* practically equivalent to FileParser.pp_to_string *)
   val pp_to_string: int -> int -> Ast.dec -> string
+
+  (* practically equivalent to FileParser.pp_to_string, but for Ast.exp *)
   val pp_e_to_string: int -> int -> Ast.exp -> string
+
+  (* strips an ast of all Mark* constructors *)
   val strip_marks: Ast.dec -> Ast.dec
+
+  (* a useful structure for handling maps from symbols to other values *)
   structure SymbolMap: ORD_MAP where type Key.ord_key = Symbol.symbol
+
+  (* collects all top-level val, valrec, and fun declarations into a map
+   *
+   * #1 in the result contains everything;
+   * #2 contains only the fun declarations
+   *
+   * a symbol maps to a list of expressions in order of declaration; that is,
+   * since SML permits re-binding symbols, this table comprises all of them *)
   val symbol_table: Ast.dec -> Ast.exp list SymbolMap.map * Ast.exp list SymbolMap.map
 end = struct
   open Ast
